@@ -1,21 +1,29 @@
 package com.example.helloapi;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/hello")
 public class HelloController {
 
-    @GetMapping("/hello")
-    public HelloResponse hello(@RequestParam(name = "name", defaultValue = "World") String name) {
-        return new HelloResponse("Hello, " + name + "!");
+    private final HelloService helloService;
+
+    public HelloController(HelloService helloService) {
+        this.helloService = helloService;
     }
 
-    @GetMapping("/hello/{name}")
-    public HelloResponse helloPath(@PathVariable(name = "name") String name) {
-        return new HelloResponse("Hello, " + name + "!");
+    @GetMapping
+    public HelloResponse hello(@RequestParam(defaultValue = "World") String name) {
+        return helloService.greet(name, "en");
     }
 
+    @GetMapping("/{name}")
+    public HelloResponse helloPath(@PathVariable String name) {
+        return helloService.greet(name, "en");
+    }
+
+    @PostMapping
+    public HelloResponse helloPost(@RequestBody GreetRequest request) {
+        return helloService.greet(request.getName(), request.getLanguage());
+    }
 }
